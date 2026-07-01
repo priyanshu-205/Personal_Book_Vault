@@ -3,7 +3,9 @@
 {% block title %} Login Page {% endblock %}
 
 {% block body %} 
-<div class="">
+<div class="auth-container">
+
+    <div class="auth-card">
 <h1> Log in to your Account</h1>
 <form method="POST" action="{{url_for('auth.user_login')}}" >
 <label for ="username" >Username</label> 
@@ -20,4 +22,7 @@
     </a>
 </p>
 </div>
-    {% endblock %}
+</div>
+    {% endblock %} 
+    
+    {% block scripts %} <script src="{{ url_for('static', filename='js/base.js') }}"></script>{% endblock %} 

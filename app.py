@@ -3,6 +3,8 @@ from auth.routes_auth import auth_bp
 from books.routes_books import books_bp
 from friends.friends_routes import friends_bp
 from auth.models_user import User
+from books.models_books import Books, UserBook
+from friends.models import Friendship, ReadingSession, SessionParticipant
 from flask import Flask
 
 from core.extensions import db,migrate,bcrypt,login_manager

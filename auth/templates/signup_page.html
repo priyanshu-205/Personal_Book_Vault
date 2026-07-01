@@ -1,9 +1,11 @@
 {% extends "base.html" %}
     
-{% block title %} Login Page {% endblock %}
+{% block title %} Signup Page {% endblock %}
 
 {% block body %} 
-<div class="">
+<div class="auth-container">
+
+    <div class="auth-card">
 <h1>  Create your Account</h1>
 <form method="POST" action="{{url_for('auth.signup')}}" >
 <label for ="username" >Username</label> 
@@ -15,6 +17,7 @@
 <input type="submit" value="Login">
 
 </form>
-
+    </div>
 </div>
     {% endblock %}
+        {% block scripts %} <script src="{{ url_for('static', filename='js/base.js') }}"></script>{% endblock %} 

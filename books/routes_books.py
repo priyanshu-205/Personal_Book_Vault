@@ -13,15 +13,18 @@ books_bp=Blueprint('books',__name__,template_folder='templates')
 @login_required
 def home():
     if request.method=='GET':
+        
         books = UserBook.query.filter_by(user_id=current_user.id).all()
         return render_template('home_page.html',books=books)
     if request.method=='POST':
         book_title=request.form.get('title')
         book_author=request.form.get('author')
         book_genre=request.form.get('genre')
+        book_status=request.form.get('status')
+        
         existing_book=Books.query.filter_by(title=book_title).first()#check if book is in the books table
         if existing_book:
-            addbook=UserBook(user_id=current_user.id,book_id=existing_book.book_id)
+            addbook=UserBook(user_id=current_user.id,book_id=existing_book.book_id,status=book_status)
             db.session.add(addbook)
             db.session.commit()
             return redirect(url_for('books.home'))
@@ -31,7 +34,8 @@ def home():
             db.session.add(newbook)
             db.session.commit()
             existing_book=Books.query.filter_by(title=book_title).first()
-            addbook=UserBook(user_id=current_user.id,book_id=existing_book.book_id)
+            book_status=request.form.get('status')
+            addbook=UserBook(user_id=current_user.id,book_id=existing_book.book_id,status=book_status)
             db.session.add(addbook)
             db.session.commit()
             return redirect(url_for('books.home'))
