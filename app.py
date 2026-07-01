@@ -20,7 +20,7 @@ def create_app():
     bcrypt.init_app(app)
     login_manager.init_app(app)
     
-    app.secret_key=os.getenv("Key")
+    app.secret_key=os.getenv('key')
     app.config['SESSION_TYPE']='sqlalchemy'
     app.config['SESSION_SQLALCHEMY']=db
     Session(app)

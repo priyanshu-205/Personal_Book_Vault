@@ -10,7 +10,7 @@ auth_bp = Blueprint("auth", __name__, template_folder="templates")
 def user_login():
     if request.method == "GET":
         if current_user.is_authenticated:
-            return redirect(url_for("books.home_page"))
+            return redirect(url_for("books.home"))
         else:
             return render_template("login_page.html")
 
@@ -25,7 +25,7 @@ def user_login():
             #   create session for the user if log in successfull
             login_user(existing_user, remember=True)
             flash("Login Sucessfull")
-            return redirect(url_for("books.home_page"))
+            return redirect(url_for("books.home"))
         else:  ## if the user exists but the password is wrong
             flash("Invalid username or password")
             return render_template("login_page.html")
