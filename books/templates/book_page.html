@@ -1,273 +1,122 @@
 {% extends "base.html" %}
 
-{% block title %}
-{{ book.title }}
-{% endblock %}
+{% block title %}{{ book.title }} · The Personal Book Vault{% endblock %}
 
 {% block body %}
+<div class="page-container">
 
-<div class="book-page">
+    <a href="{{ url_for('books.home') }}" class="btn" style="margin-bottom: 24px;">&larr; Back to Library</a>
 
-    <div class="book-topbar">
+    <div class="detail-layout">
 
-        <a href="{{ url_for('books.home') }}" class="back-btn">
-            ← Back to Library
-        </a>
-
-        <form method="POST"
-              action="{{ url_for('books.remove_book',
-              book_id=book.book_id) }}">
-
-            <button class="delete-btn">
-
-                Remove Book
-
-            </button>
-
-        </form>
-
-    </div>
-
-
-    <div class="book-header">
-
-        <div class="book-cover">
-
-            <!-- Placeholder -->
-            <img src="{{ url_for('static',
-            filename='images/default_book.png') }}">
-
+        <div class="detail-cover">
+            {% if book.cover_image %}
+                <img
+                    src="{{ url_for('static', filename='covers/' + book.cover_image) }}"
+                    alt="Cover of {{ book.title }}">
+            {% else %}
+                <img
+                    src="{{ url_for('static', filename='covers/default_book.png') }}"
+                    alt="No cover available for {{ book.title }}">
+            {% endif %}
         </div>
 
-        <div class="book-info">
+        <div class="detail-main">
 
             <h1>{{ book.title }}</h1>
+            <p class="author">by {{ book.author }}</p>
 
-            <h3>{{ book.author }}</h3>
+            <div class="meta-row">
+                <span class="status {{ user_book.status|lower|replace(' ', '-') }}">
+                    {{ user_book.status }}
+                </span>
 
-            <p>
+                {% if book.genre %}
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">{{ book.genre }}</span>
+                {% endif %}
 
-                <strong>Genre:</strong>
+                {% if user_book.rating %}
+                    <span class="rating-display">{{ '★' * user_book.rating }}{{ '☆' * (5 - user_book.rating) }}</span>
+                {% endif %}
+            </div>
 
-                {{ book.genre }}
+            <!-- Update status -->
+            <form
+                method="POST"
+                action="{{ url_for('books.update_status', book_id=book.book_id) }}"
+                class="inline-form">
 
-            </p>
+                <div class="field" style="margin-bottom: 0;">
+                    <label for="status">Reading status</label>
+                    <select id="status" name="status">
+                        {% for status in statuses %}
+                            <option value="{{ status }}" {% if status == user_book.status %}selected{% endif %}>
+                                {{ status }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <p>
+                <button type="submit" class="btn btn-primary">Update Status</button>
+            </form>
 
-                <strong>Added:</strong>
+            <!-- Review + rating -->
+            <div class="detail-section">
+                <h2>Your Review</h2>
 
-                {{ user_book.added_at.strftime('%d %b %Y') }}
+                <div class="review-display">
+                    {% if user_book.review %}
+                        <p>{{ user_book.review }}</p>
+                    {% else %}
+                        <p class="no-review">No review yet. Share your thoughts below.</p>
+                    {% endif %}
+                </div>
 
-            </p>
+                <form
+                    method="POST"
+                    action="{{ url_for('books.add_review', book_id=book.book_id) }}"
+                    novalidate>
+
+                    <div class="field">
+                        <label>Rating</label>
+                        <div class="star-rating">
+                            {% for i in range(5, 0, -1) %}
+                                <input
+                                    type="radio"
+                                    id="star{{ i }}"
+                                    name="rating"
+                                    value="{{ i }}"
+                                    {% if user_book.rating == i %}checked{% endif %}>
+                                <label for="star{{ i }}">★</label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="review">Review</label>
+                        <textarea
+                            id="review"
+                            name="review"
+                            placeholder="What did you think of this book?">{{ user_book.review or '' }}</textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Save Review</button>
+                </form>
+            </div>
+
+            <!-- Remove from library -->
+            <div class="detail-section">
+                <form
+                    method="POST"
+                    action="{{ url_for('books.remove_book', book_id=book.book_id) }}"
+                    data-confirm="Remove this book from your library? This cannot be undone.">
+                    <button type="submit" class="btn btn-danger">Remove from Library</button>
+                </form>
+            </div>
 
         </div>
-
-    </div>
-
-
-
-    <div class="book-section">
-
-        <h2>Reading Status</h2>
-
-        <form method="POST"
-              action="{{ url_for('books.update_status',
-              book_id=book.book_id) }}">
-
-            <select name="status"
-                    onchange="this.form.submit()">
-
-                <option value="Reading"
-                {% if user_book.status=="Reading" %}
-                selected
-                {% endif %}>
-                Reading
-                </option>
-
-                <option value="Completed"
-                {% if user_book.status=="Completed" %}
-                selected
-                {% endif %}>
-                Completed
-                </option>
-
-                <option value="On Hold"
-                {% if user_book.status=="On Hold" %}
-                selected
-                {% endif %}>
-                On Hold
-                </option>
-
-                <option value="Dropped"
-                {% if user_book.status=="Dropped" %}
-                selected
-                {% endif %}>
-                Dropped
-                </option>
-
-                <option value="Plan to Read"
-                {% if user_book.status=="Plan to Read" %}
-                selected
-                {% endif %}>
-                Plan to Read
-                </option>
-
-            </select>
-
-        </form>
-
-    </div>
-
-
-
-    <div class="book-section">
-
-        <h2>Your Review</h2>
-
-        <form method="POST"
-              action="{{ url_for('books.add_review',
-              book_id=book.book_id) }}">
-
-            <label>Rating</label>
-
-            <select name="rating">
-
-                <option value="1"
-                {% if user_book.rating==1 %}selected{% endif %}>
-                ⭐
-                </option>
-
-                <option value="2"
-                {% if user_book.rating==2 %}selected{% endif %}>
-                ⭐⭐
-                </option>
-
-                <option value="3"
-                {% if user_book.rating==3 %}selected{% endif %}>
-                ⭐⭐⭐
-                </option>
-
-                <option value="4"
-                {% if user_book.rating==4 %}selected{% endif %}>
-                ⭐⭐⭐⭐
-                </option>
-
-                <option value="5"
-                {% if user_book.rating==5 %}selected{% endif %}>
-                ⭐⭐⭐⭐⭐
-                </option>
-
-            </select>
-
-            <label>Your Review</label>
-
-            <textarea
-                name="review"
-                rows="8"
-                placeholder="Write your thoughts...">{{ user_book.review or "" }}</textarea>
-
-            <button type="submit">
-
-                Save Review
-
-            </button>
-
-        </form>
-
-    </div>
-
-
-
-    <div class="book-section">
-
-        <h2>Book Information</h2>
-
-        <table class="book-table">
-
-            <tr>
-
-                <th>Title</th>
-
-                <td>{{ book.title }}</td>
-
-            </tr>
-
-            <tr>
-
-                <th>Author</th>
-
-                <td>{{ book.author }}</td>
-
-            </tr>
-
-            <tr>
-
-                <th>Genre</th>
-
-                <td>{{ book.genre }}</td>
-
-            </tr>
-
-            <tr>
-
-                <th>Status</th>
-
-                <td>{{ user_book.status }}</td>
-
-            </tr>
-
-            <tr>
-
-                <th>Rating</th>
-
-                <td>
-
-                    {% if user_book.rating %}
-
-                        {{ user_book.rating }} ⭐
-
-                    {% else %}
-
-                        Not Rated
-
-                    {% endif %}
-
-                </td>
-
-            </tr>
-
-        </table>
-
-    </div>
-
-
-
-    <div class="book-section">
-
-        <h2>Coming Soon</h2>
-
-        <ul>
-
-            <li>Reading Progress</li>
-
-            <li>Friends' Reviews</li>
-
-            <li>Reading Sessions</li>
-
-            <li>Reading Statistics</li>
-
-        </ul>
 
     </div>
 
 </div>
-
-{% endblock %}
-
-{% block scripts %}
-
-<script src="{{ url_for('static',
-filename='js/book.js') }}"></script>
-
 {% endblock %}

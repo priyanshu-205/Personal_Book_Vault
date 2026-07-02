@@ -1,220 +1,111 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}My Library · The Personal Book Vault{% endblock %}
 
 {% block body %}
+<div class="page-container">
 
-<div class="dashboard">
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-
-        <div class="logo">
-            <h2>📚 Book Vault</h2>
+    <div class="dashboard-header">
+        <div>
+            <h1>My Library</h1>
+            <p class="subtitle">{{ books|length }} book{{ 's' if books|length != 1 else '' }} in your vault</p>
         </div>
 
-        <nav>
-
-            <a href="{{ url_for('books.home') }}">🏠 Home</a>
-
-            <a href="#">👥 Friends</a>
-
-            <a href="#">📖 Reading Sessions</a>
-
-            <a href="#">
-                🔔 Notifications
-                <span class="badge">0</span>
-            </a>
-
-            <a href="#">👤 Profile</a>
-
-        </nav>
-
-        <button id="logoutButton" class="logout-btn">
-            Logout
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBookModal">
+            + Add Book
         </button>
+    </div>
 
-    </aside>
+    <div class="status-tabs">
+        <a href="{{ url_for('books.home') }}" class="{{ 'active' if not active_status else '' }}">All</a>
+        <a href="{{ url_for('books.home', status='To Read') }}" class="{{ 'active' if active_status == 'To Read' else '' }}">To Read</a>
+        <a href="{{ url_for('books.home', status='Reading') }}" class="{{ 'active' if active_status == 'Reading' else '' }}">Reading</a>
+        <a href="{{ url_for('books.home', status='Completed') }}" class="{{ 'active' if active_status == 'Completed' else '' }}">Completed</a>
+    </div>
 
-
-    <!-- Main Content -->
-    <main class="content">
-
-        <div class="toolbar">
-
-            <h1>Your Library</h1>
-
-            <div class="toolbar-right">
-
-                <input
-                    type="text"
-                    placeholder="Search books..."
-                    id="searchBook">
-
-                <select id="statusFilter">
-
-                    <option value="">All Status</option>
-
-                    <option value="Reading">Reading</option>
-
-                    <option value="Completed">Completed</option>
-
-                    <option value="On Hold">On Hold</option>
-
-                    <option value="Dropped">Dropped</option>
-
-                    <option value="Plan to Read">
-                        Plan to Read
-                    </option>
-
-                </select>
-
-                <select id="genreFilter">
-
-                    <option value="">All Genres</option>
-
-                </select>
-
-                <button id="openModal"
-                        class="add-book-btn">
-
-                    + Add Book
-
-                </button>
-
-            </div>
-
+    {% if books %}
+        <div class="book-grid">
+            {% for book in books %}
+                {% include "components/book_card.html" with context %}
+            {% endfor %}
         </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>Nothing here yet</h3>
+            <p>
+                {% if active_status %}
+                    No books marked "{{ active_status }}" yet.
+                {% else %}
+                    Add your first book to start building your vault.
+                {% endif %}
+            </p>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addBookModal">
+                + Add Book
+            </button>
+        </div>
+    {% endif %}
 
+</div>
 
-        <div class="book-container">
+<!-- Add Book Modal -->
+<div class="modal fade" id="addBookModal" tabindex="-1" aria-labelledby="addBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
 
-            {% if books %}
+            <form method="POST" action="{{ url_for('books.home') }}" enctype="multipart/form-data" novalidate>
 
-                {% for book in books %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addBookModalLabel">Add a Book</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-                    {% include "components/book_card.html" %}
+                <div class="modal-body">
 
-                {% endfor %}
+                    <div class="field">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
 
-            {% else %}
+                    <div class="field">
+                        <label for="author">Author</label>
+                        <input type="text" id="author" name="author" required>
+                    </div>
 
-                <div class="empty-library">
+                    <div class="field">
+                        <label for="genre">Genre</label>
+                        <input type="text" id="genre" name="genre">
+                    </div>
 
-                    <h2>Your library is empty</h2>
+                    <div class="field">
+                        <label for="status">Status</label>
+                        <select id="status" name="status" required>
+                            <option value="To Read">To Read</option>
+                            <option value="Reading">Reading</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
 
-                    <p>Add your first book to get started.</p>
+                    <div class="field">
+                        <label>Cover Image (optional)</label>
+                        <div class="field-file" id="coverDropzone">
+                            <input type="file" id="cover_image" name="cover_image" accept=".png,.jpg,.jpeg,.webp">
+                            <span class="file-hint">Click to choose a jpg, jpeg, png or webp file</span>
+                        </div>
+                        <div class="file-preview" id="coverPreview">
+                            <img id="coverPreviewImg" src="" alt="Cover preview">
+                        </div>
+                    </div>
 
                 </div>
 
-            {% endif %}
+                <div class="modal-footer">
+                    <button type="button" class="btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Book</button>
+                </div>
+
+            </form>
 
         </div>
-
-    </main>
-
-</div>
-
-
-
-<!-- Add Book Modal -->
-
-<div id="addBookModal" class="modal">
-
-    <div class="modal-content">
-
-        <span id="closeModal">&times;</span>
-
-        <h2>Add Book</h2>
-
-        <form method="POST"
-              action="{{ url_for('books.home') }}">
-
-            <input
-                type="text"
-                name="title"
-                placeholder="Title"
-                required>
-
-            <input
-                type="text"
-                name="author"
-                placeholder="Author"
-                required>
-
-            <input
-                type="text"
-                name="genre"
-                placeholder="Genre"
-                required>
-
-            <select name="status">
-
-                <option value="Reading">Reading</option>
-
-                <option value="Completed">Completed</option>
-
-                <option value="On Hold">On Hold</option>
-
-                <option value="Dropped">Dropped</option>
-
-                <option value="Plan to Read">
-                    Plan to Read
-                </option>
-
-            </select>
-
-            <button type="submit">
-
-                Add Book
-
-            </button>
-
-        </form>
-
     </div>
-
 </div>
-
-
-
-<!-- Logout Modal -->
-
-<div id="logoutModal" class="modal">
-
-    <div class="modal-content">
-
-        <h2>Logout?</h2>
-
-        <p>Are you sure you want to logout?</p>
-
-        <form method="GET"
-              action="{{ url_for('books.logout') }}">
-
-            <button type="submit">
-
-                Yes
-
-            </button>
-
-            <button
-                type="button"
-                id="cancelLogout">
-
-                No
-
-            </button>
-
-        </form>
-
-    </div>
-
-</div>
-
-{% endblock %}
-
-{% block scripts %}
-
-<script src="{{ url_for('static', filename='js/home.js') }}"></script>
-
 {% endblock %}

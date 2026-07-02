@@ -1,43 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>
-            {% block title %} default vlaue {% endblock %}
+            {% block title %}The Personal Book Vault{% endblock %}
         </title>
+
+        <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
         <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-        
+
+        {% block extra_css %}{% endblock %}
     </head>
     <body>
-    
 
-{% with messages = get_flashed_messages(with_categories=true) %}
+        <nav class="navbar">
+            <a href="{{ url_for('books.home') if current_user.is_authenticated else url_for('auth.user_login') }}" class="brand">
+                <span class="brand-mark">📚</span>
+                <span>The Personal Book Vault</span>
+            </a>
 
-{% if messages %}
+            <div class="nav-links">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('books.home') }}">My Library</a>
+                    <a href="{{ url_for('books.logout') }}">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.user_login') }}">Login</a>
+                    <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">Sign Up</a>
+                {% endif %}
+            </div>
+        </nav>
 
-<div id="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div id="flash-container">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
 
-    {% for category, message in messages %}
+        {% block body %}{% endblock %}
 
-        <div class="flash {{ category }}">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
-            {{ message }}
-
-        </div>
-
-    {% endfor %}
-
-</div>
-
-{% endif %}
-
-{% endwith %}
-
-
-
-
-        {% block body %} default vlaue {% endblock %}
-
+        {% block scripts %}{% endblock %}
     </body>
-     {% block scripts %} {% endblock %}
 </html>
-   <script 

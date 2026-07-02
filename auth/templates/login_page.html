@@ -1,28 +1,43 @@
 {% extends "base.html" %}
-    
-{% block title %} Login Page {% endblock %}
 
-{% block body %} 
-<div class="auth-container">
+{% block title %}Log In · The Personal Book Vault{% endblock %}
 
+{% block body %}
+<div class="auth-shell">
     <div class="auth-card">
-<h1> Log in to your Account</h1>
-<form method="POST" action="{{url_for('auth.user_login')}}" >
-<label for ="username" >Username</label> 
-<input type ="text" id="username" name="username" placeholder="Enter Username" required><br>
-<label for ="password" >Password</label> 
-<input type ="password" id="password" name="password" placeholder="Enter Password" required><br>
-<input type="submit" value="Login">
+        <h1>Welcome back</h1>
+        <p class="subtitle">Log in to see your reading list.</p>
 
-</form>
-<p class="signup-text">
-    Don't have an account?
-    <a href="{{ url_for('auth.signup') }}">
-        Sign Up
-    </a>
-</p>
+        <form method="POST" action="{{ url_for('auth.user_login') }}" novalidate>
+
+            <div class="field">
+                <label for="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    autocomplete="username"
+                    required
+                    autofocus>
+            </div>
+
+            <div class="field">
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    autocomplete="current-password"
+                    required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Log In</button>
+
+        </form>
+
+        <p class="switch-link">
+            Don't have an account? <a href="{{ url_for('auth.signup') }}">Sign up</a>
+        </p>
+    </div>
 </div>
-</div>
-    {% endblock %} 
-    
-    {% block scripts %} <script src="{{ url_for('static', filename='js/base.js') }}"></script>{% endblock %} 
+{% endblock %}
