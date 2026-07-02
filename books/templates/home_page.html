@@ -1,76 +1,220 @@
 {% extends "base.html" %}
 
-{% block title %}Home {% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block body %}
 
-<h1>Your Library</h1>
+<div class="dashboard">
 
-<button id="openModal" class="add-book-btn">
-    ＋ Add Book
-</button>
+    <!-- Sidebar -->
+    <aside class="sidebar">
 
-<div id="addBookModal" class="modal">
-<div class="modal-content">
+        <div class="logo">
+            <h2>📚 Book Vault</h2>
+        </div>
 
-<span id="closeModal">&times;</span>
+        <nav>
 
-<h2>Add Book</h2>
+            <a href="{{ url_for('books.home') }}">🏠 Home</a>
 
-<form method="POST" action="{{ url_for('books.home') }}">
+            <a href="#">👥 Friends</a>
 
-<input type="text" name="title" placeholder="Title" required>
-<input type="text" name="author" placeholder="Author" required>
-<input type="text" name="genre" placeholder="Genre"required>
+            <a href="#">📖 Reading Sessions</a>
 
-<select name="status">
-<option value="Reading">
-Reading
-</option>
+            <a href="#">
+                🔔 Notifications
+                <span class="badge">0</span>
+            </a>
 
-<option value="Completed">
-Completed
-</option>
+            <a href="#">👤 Profile</a>
 
-<option value="On Hold">
-On Hold
-</option>
+        </nav>
 
-<option value="Dropped">
-Dropped
-</option>
+        <button id="logoutButton" class="logout-btn">
+            Logout
+        </button>
 
-<option value="Plan to Read">
-Plan to Read
-</option>
+    </aside>
 
-</select>
 
-<button>
+    <!-- Main Content -->
+    <main class="content">
 
-Add Book
+        <div class="toolbar">
 
-    </button>
+            <h1>Your Library</h1>
 
-</form>
+            <div class="toolbar-right">
+
+                <input
+                    type="text"
+                    placeholder="Search books..."
+                    id="searchBook">
+
+                <select id="statusFilter">
+
+                    <option value="">All Status</option>
+
+                    <option value="Reading">Reading</option>
+
+                    <option value="Completed">Completed</option>
+
+                    <option value="On Hold">On Hold</option>
+
+                    <option value="Dropped">Dropped</option>
+
+                    <option value="Plan to Read">
+                        Plan to Read
+                    </option>
+
+                </select>
+
+                <select id="genreFilter">
+
+                    <option value="">All Genres</option>
+
+                </select>
+
+                <button id="openModal"
+                        class="add-book-btn">
+
+                    + Add Book
+
+                </button>
+
+            </div>
 
         </div>
+
+
+        <div class="book-container">
+
+            {% if books %}
+
+                {% for book in books %}
+
+                    {% include "components/book_card.html" %}
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="empty-library">
+
+                    <h2>Your library is empty</h2>
+
+                    <p>Add your first book to get started.</p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </main>
 
 </div>
 
 
-<div class="book-container">
 
-{% for book in books %}
+<!-- Add Book Modal -->
 
-    {% include "components/book_card.html" %}
+<div id="addBookModal" class="modal">
 
-{% endfor %}
+    <div class="modal-content">
+
+        <span id="closeModal">&times;</span>
+
+        <h2>Add Book</h2>
+
+        <form method="POST"
+              action="{{ url_for('books.home') }}">
+
+            <input
+                type="text"
+                name="title"
+                placeholder="Title"
+                required>
+
+            <input
+                type="text"
+                name="author"
+                placeholder="Author"
+                required>
+
+            <input
+                type="text"
+                name="genre"
+                placeholder="Genre"
+                required>
+
+            <select name="status">
+
+                <option value="Reading">Reading</option>
+
+                <option value="Completed">Completed</option>
+
+                <option value="On Hold">On Hold</option>
+
+                <option value="Dropped">Dropped</option>
+
+                <option value="Plan to Read">
+                    Plan to Read
+                </option>
+
+            </select>
+
+            <button type="submit">
+
+                Add Book
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- Logout Modal -->
+
+<div id="logoutModal" class="modal">
+
+    <div class="modal-content">
+
+        <h2>Logout?</h2>
+
+        <p>Are you sure you want to logout?</p>
+
+        <form method="GET"
+              action="{{ url_for('books.logout') }}">
+
+            <button type="submit">
+
+                Yes
+
+            </button>
+
+            <button
+                type="button"
+                id="cancelLogout">
+
+                No
+
+            </button>
+
+        </form>
+
+    </div>
 
 </div>
 
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static',filename='js/home.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+
 {% endblock %}

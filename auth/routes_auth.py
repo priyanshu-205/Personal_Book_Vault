@@ -50,3 +50,4 @@ def signup():
         db.session.commit()
         flash("Account created successfully! Please log in.")
         return redirect(url_for("auth.user_login"))
+

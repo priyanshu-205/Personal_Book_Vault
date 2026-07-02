@@ -1,24 +1,56 @@
 <div class="book-card">
 
-    <a href="{{ url_for('books.book_detail', book_id=book.book_id) }}">
+    <a href="{{ url_for('books.book_detail',
+                        book_id=book.book.book_id) }}">
 
         <div class="cover">
 
-            {% if book.cover_image %}
-                <img src="{{ url_for('static',filename='covers/' + book.cover_image) }}">
+            {% if book.book.cover_image %}
+
+                <img
+                src="{{ url_for(
+                'static',
+                filename='covers/' + book.book.cover_image) }}">
+
             {% else %}
-                📖
+
+                <img
+                src="{{ url_for(
+                'static',
+                filename='covers/default_book.png') }}">
+
             {% endif %}
 
         </div>
 
     </a>
 
-    <h3>{{ book.title }}</h3>
-    <p>{{ book.author }}</p>
+    <div class="book-info">
 
-    <span class="status {{ book.status}}">
-        {{ book.status }}
-    </span>
+        <h3>
+
+            {{ book.book.title }}
+
+        </h3>
+
+        <p>
+
+            {{ book.book.author }}
+
+        </p>
+
+        <p class="genre">
+
+            {{ book.book.genre }}
+
+        </p>
+
+        <span class="status {{ book.status|lower|replace(' ','-') }}">
+
+            {{ book.status }}
+
+        </span>
+
+    </div>
 
 </div>

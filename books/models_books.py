@@ -9,7 +9,7 @@ class Books(db.Model):
     author=db.Column(db.String(200),nullable=False)
     title=db.Column(db.String(200),nullable=False)
     genre=db.Column(db.String(200))
-    
+    cover_image = db.Column(db.String(255))
     user_books = db.relationship(
         "UserBook",
         back_populates="book",
@@ -27,6 +27,8 @@ class UserBook(db.Model):
     user_id=db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
     book_id=db.Column(db.Integer,db.ForeignKey('books.book_id'),nullable=False)
     status=db.Column(db.String(200),nullable=False)
+    review=db.Column(db.Text,nullable=True)
+    rating=db.Column(db.Integer,nullable=True)
     added_at=db.Column(db.DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         nullable=False)
