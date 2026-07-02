@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Find Friends · The Personal Book Vault{% endblock %}
+
+{% block body %}
+<div class="page-container">
+
+    <div class="dashboard-header">
+        <div>
+            <h1>Find Friends</h1>
+            <p class="subtitle">Search for people by username</p>
+        </div>
+    </div>
+
+    {% include "components/friends_nav.html" %}
+
+    <form method="GET" action="{{ url_for('friends.search') }}" class="search-form">
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            placeholder="Search by username..."
+            autofocus>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {% if query and not results %}
+        <div class="empty-state">
+            <h3>No users found</h3>
+            <p>Try a different username.</p>
+        </div>
+    {% elif results %}
+        <div class="friend-list">
+            {% for item in results %}
+                <div class="friend-card">
+                    <div class="friend-avatar">{{ item.user.username[0]|upper }}</div>
+
+                    <div class="friend-info">
+                        <h3>{{ item.user.username }}</h3>
+                    </div>
+
+                    {% if item.relation == 'friends' %}
+                        <span class="status completed">Friends</span>
+                    {% elif item.relation == 'requested' %}
+                        <span class="status to-read">Requested</span>
+                    {% elif item.relation == 'incoming' %}
+                        <a href="{{ url_for('friends.requests_view') }}" class="btn btn-primary">Respond</a>
+                    {% else %}
+                        <form method="POST" action="{{ url_for('friends.send_request', user_id=item.user.id) }}">
+                            <button type="submit" class="btn btn-primary">Add Friend</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

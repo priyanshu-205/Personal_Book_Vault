@@ -1,11 +1,22 @@
 from core.extensions import db
-from datetime import datetime,timezone
+from datetime import datetime, timezone
+
 
 class Friendship(db.Model):
-    __tablename__='friendship'
-    id=db.Column(db.Integer,primary_key=True)
-    user_id=db.Column(db.Integer,db.ForeignKey('user.id'))
-    friend_id=db.Column(db.Integer,db.ForeignKey('user.id'))#self referential integrity
+    __tablename__ = 'friendship'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    friend_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    # 'pending'  -> user_id sent a request to friend_id, not yet answered
+    # 'accepted' -> the two users are friends
+    status = db.Column(db.String(20), nullable=False, default="pending")
+
+    created_at = db.Column(
+        db.DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
 
     user = db.relationship(
         "User",
@@ -18,17 +29,18 @@ class Friendship(db.Model):
         foreign_keys=[friend_id],
         back_populates="friend_of"
     )
-    
+
+
 class ReadingSession(db.Model):
-    __tablename__='reading_session'
-    id=db.Column(db.Integer,primary_key=True)
-    creator_id=db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
-    book_id=db.Column(db.Integer,db.ForeignKey('books.book_id'),nullable=False)
-    
+    __tablename__ = 'reading_session'
+    id = db.Column(db.Integer, primary_key=True)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    book_id = db.Column(db.Integer, db.ForeignKey('books.book_id'), nullable=False)
+
     creator_user = db.relationship(
-    "User",
-    foreign_keys=[creator_id],
-    back_populates="created_sessions"
+        "User",
+        foreign_keys=[creator_id],
+        back_populates="created_sessions"
     )
 
     book = db.relationship(
@@ -40,13 +52,14 @@ class ReadingSession(db.Model):
         "SessionParticipant",
         back_populates="session",
     )
-    
+
+
 class SessionParticipant(db.Model):
-    __tablename__='session_participant'
-    id=db.Column(db.Integer,primary_key=True)
-    session_id = db.Column(db.Integer,db.ForeignKey("reading_session.id"),nullable=False)
-    participant=db.Column(db.Integer,db.ForeignKey('user.id'))
-    
+    __tablename__ = 'session_participant'
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.Integer, db.ForeignKey("reading_session.id"), nullable=False)
+    participant = db.Column(db.Integer, db.ForeignKey('user.id'))
+
     session = db.relationship(
         "ReadingSession",
         back_populates="participants"
@@ -56,5 +69,3 @@ class SessionParticipant(db.Model):
         "User",
         back_populates="joined_sessions"
     )
-    
-    

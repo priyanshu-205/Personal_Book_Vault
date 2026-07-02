@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Friend Requests · The Personal Book Vault{% endblock %}
+
+{% block body %}
+<div class="page-container">
+
+    <div class="dashboard-header">
+        <div>
+            <h1>Friend Requests</h1>
+            <p class="subtitle">{{ incoming|length }} pending request{{ 's' if incoming|length != 1 else '' }}</p>
+        </div>
+    </div>
+
+    {% include "components/friends_nav.html" %}
+
+    {% if incoming %}
+        <div class="friend-list">
+            {% for req in incoming %}
+                <div class="friend-card">
+                    <div class="friend-avatar">{{ req.user.username[0]|upper }}</div>
+
+                    <div class="friend-info">
+                        <h3>{{ req.user.username }}</h3>
+                        <p>wants to be your friend</p>
+                    </div>
+
+                    <div class="friend-actions">
+                        <form method="POST" action="{{ url_for('friends.accept_request', request_id=req.id) }}">
+                            <button type="submit" class="btn btn-primary">Accept</button>
+                        </form>
+
+                        <form method="POST" action="{{ url_for('friends.decline_request', request_id=req.id) }}">
+                            <button type="submit" class="btn">Decline</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No pending requests</h3>
+            <p>You're all caught up.</p>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}

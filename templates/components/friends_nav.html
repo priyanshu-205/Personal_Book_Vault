@@ -1,0 +1,15 @@
+<div class="status-tabs">
+    <a href="{{ url_for('friends.friends_list') }}" class="{{ 'active' if active_tab == 'friends' else '' }}">
+        Friends
+    </a>
+    <a href="{{ url_for('friends.requests_view') }}" class="{{ 'active' if active_tab == 'requests' else '' }}">
+        Requests
+        {% if pending_count %}<span class="badge-count">{{ pending_count }}</span>{% endif %}
+    </a>
+    <a href="{{ url_for('friends.search') }}" class="{{ 'active' if active_tab == 'search' else '' }}">
+        Search
+    </a>
+    <a href="{{ url_for('friends.activity') }}" class="{{ 'active' if active_tab == 'activity' else '' }}">
+        Activity
+    </a>
+</div>

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Activity · The Personal Book Vault{% endblock %}
+
+{% block body %}
+<div class="page-container">
+
+    <div class="dashboard-header">
+        <div>
+            <h1>Friend Activity</h1>
+            <p class="subtitle">Books your friends have finished</p>
+        </div>
+    </div>
+
+    {% include "components/friends_nav.html" %}
+
+    {% if entries %}
+        <div class="activity-feed">
+            {% for entry in entries %}
+                <div class="activity-item">
+
+                    <div class="activity-cover">
+                        {% if entry.book.cover_image %}
+                            <img
+                                src="{{ url_for('static', filename='covers/' + entry.book.cover_image) }}"
+                                alt="Cover of {{ entry.book.title }}">
+                        {% else %}
+                            <img
+                                src="{{ url_for('static', filename='covers/default_book.png') }}"
+                                alt="No cover available">
+                        {% endif %}
+                    </div>
+
+                    <div class="activity-body">
+                        <p class="activity-heading">
+                            <strong>{{ entry.user.username }}</strong> completed
+                            <a href="{{ url_for('books.book_detail', book_id=entry.book.book_id) }}">{{ entry.book.title }}</a>
+                        </p>
+
+                        {% if entry.rating %}
+                            <span class="rating-display">{{ '★' * entry.rating }}{{ '☆' * (5 - entry.rating) }}</span>
+                        {% endif %}
+
+                        {% if entry.review %}
+                            <p class="activity-review">&ldquo;{{ entry.review }}&rdquo;</p>
+                        {% endif %}
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No activity yet</h3>
+            <p>Once your friends finish books, they'll show up here.</p>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
