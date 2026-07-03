@@ -76,8 +76,8 @@ def home():
             flash("Invalid reading status.", "error")
             return redirect(url_for("books.home"))
 
-        # Resolve or create the catalog-level Books row first,
-        # matching on title + author (not title alone).
+        
+
         existing_book = Books.query.filter_by(
             title=book_title, author=book_author
         ).first()
@@ -111,7 +111,7 @@ def home():
             flash("Book added successfully.", "success")
             return redirect(url_for("books.home"))
 
-        # New book: only now do we touch the filesystem.
+        
         cover = request.files.get("cover_image")
         print(cover)
         filename = save_cover(cover)
